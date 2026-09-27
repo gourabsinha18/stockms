@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block page_title %}{{ 'My Requests Pending Approval' if is_employee_view else 'Pending Approvals' }}{% endblock %}
+{% block content %}
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Transfers {% if not is_employee_view %}awaiting your approval{% endif %}</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Requested By</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for t in transfers %}
+                <tr>
+                    <td>{{ t.transfer_code }}</td><td>{{ t.source_location.name }}</td><td>{{ t.dest_location.name }}</td>
+                    <td>{{ t.requester.full_name }}</td><td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('transfers.view_transfer', transfer_id=t.id) }}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-muted text-center py-3">Nothing pending.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Adjustments {% if not is_employee_view %}awaiting your approval{% endif %}</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Code</th><th>Location</th><th>Product</th><th>Change</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for a in adjustments %}
+                <tr>
+                    <td>{{ a.adjustment_code }}</td><td>{{ a.location.name }}</td><td>{{ a.product.name }}</td>
+                    <td class="{{ 'text-success' if a.adjustment_qty > 0 else 'text-danger' }}">{{ '+' if a.adjustment_qty > 0 else '' }}{{ a.adjustment_qty }}</td>
+                    <td><span class="badge badge-status-{{ a.status }}">{{ a.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('adjustments.view_adjustment', adjustment_id=a.id) }}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-muted text-center py-3">Nothing pending.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Returns {% if not is_employee_view %}awaiting your approval{% endif %}</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for r in returns %}
+                <tr>
+                    <td>{{ r.return_code }}</td><td>{{ r.source_location.name }}</td><td>{{ r.dest_location.name }}</td>
+                    <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('returns.view_return', return_id=r.id) }}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-muted text-center py-3">Nothing pending.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold">Bad Product Transfers {% if not is_employee_view %}awaiting your approval{% endif %}</div>
+    <div class="card-body">
+        <p class="text-muted small mb-2">These transfer <strong>Bad Product Stock only</strong>; normal/available stock is never affected by these requests.</p>
+        <table class="table table-sm">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Product</th><th class="text-end">Qty</th><th>Requested By</th><th>Requested Date</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for bt in bad_transfers %}
+                <tr>
+                    <td>{{ bt.transfer_code }}</td><td>{{ bt.source_location.name }}</td><td>{{ bt.dest_location.name }}</td>
+                    <td>{{ bt.items|map(attribute='product.name')|join(', ') }}</td>
+                    <td class="text-end">{{ bt.items|sum(attribute='quantity') }}</td>
+                    <td>{{ bt.requester.full_name }}</td>
+                    <td>{{ bt.requested_at.strftime('%Y-%m-%d') }}</td>
+                    <td><span class="badge badge-status-{{ bt.status }}">{{ bt.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('bad_products.view_transfer', transfer_id=bt.id) }}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="9" class="text-muted text-center py-3">Nothing pending.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

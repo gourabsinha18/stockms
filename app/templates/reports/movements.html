@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block page_title %}Stock Movement Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <form method="GET" class="d-flex gap-2">
+        <select name="movement_type" class="form-select" onchange="this.form.submit()">
+            <option value="">All Types</option>
+            {% for t in ['STOCK_IN','TRANSFER_OUT','TRANSFER_IN','ADJUSTMENT_IN','ADJUSTMENT_OUT','RETURN_OUT','RETURN_IN'] %}
+                <option value="{{ t }}" {% if movement_type==t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <a href="{{ url_for('reports.movement_report', movement_type=movement_type, export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover table-sm">
+            <thead><tr><th>Date</th><th>Product</th><th>Location</th><th>Type</th><th class="text-end">Before</th><th class="text-end">Change</th><th class="text-end">After</th><th>User</th></tr></thead>
+            <tbody>
+            {% for m in rows %}
+                <tr>
+                    <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ m.product.name }}</td><td>{{ m.location.name }}</td>
+                    <td><span class="badge bg-secondary">{{ m.movement_type }}</span></td>
+                    <td class="text-end">{{ m.qty_before }}</td>
+                    <td class="text-end {{ 'text-success' if m.qty_change > 0 else 'text-danger' }}">{{ '+' if m.qty_change > 0 else '' }}{{ m.qty_change }}</td>
+                    <td class="text-end">{{ m.qty_after }}</td><td>{{ m.user.full_name }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

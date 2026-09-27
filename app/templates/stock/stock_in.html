@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block page_title %}Stock In / Receiving{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.location_id.label(class="form-label") }}
+                            {{ form.location_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.reference_number.label(class="form-label") }}
+                            {{ form.reference_number(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.supplier_source.label(class="form-label") }}
+                            {{ form.supplier_source(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.remarks.label(class="form-label") }}
+                            {{ form.remarks(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <hr>
+                    <label class="form-label fw-semibold">Products Received</label>
+                    <div id="line-items">
+                        <div class="row g-2 mb-2 line-item">
+                            <div class="col-7">
+                                <select name="product_id[]" class="form-select">
+                                    <option value="">Select product</option>
+                                    {% for p in products %}
+                                        <option value="{{ p.id }}">{{ p.sku }} - {{ p.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <input type="number" name="quantity[]" min="1" class="form-control" placeholder="Qty">
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-danger remove-line">&times;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="add-line" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-plus"></i> Add product</button>
+                    <div>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('add-line').addEventListener('click', function() {
+    const container = document.getElementById('line-items');
+    const clone = container.firstElementChild.cloneNode(true);
+    clone.querySelectorAll('input,select').forEach(el => el.value = '');
+    container.appendChild(clone);
+});
+document.getElementById('line-items').addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-line')) {
+        const items = document.querySelectorAll('.line-item');
+        if (items.length > 1) e.target.closest('.line-item').remove();
+    }
+});
+</script>
+{% endblock %}

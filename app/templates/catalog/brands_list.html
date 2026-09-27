@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block page_title %}Companies / Brands{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h5 class="mb-0">Companies / Brands</h5>
+    <a href="{{ url_for('catalog.new_brand') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Brand</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Unit</th><th>Code</th><th>Name</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for b in brands %}
+                <tr>
+                    <td><span class="badge bg-info text-dark">{{ b.unit.name }}</span></td>
+                    <td>{{ b.code }}</td>
+                    <td>{{ b.name }}</td>
+                    <td>{% if b.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+                    <td class="text-end"><a href="{{ url_for('catalog.edit_brand', brand_id=b.id) }}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-muted text-center py-4">No brands found. Add a unit first, then a brand.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

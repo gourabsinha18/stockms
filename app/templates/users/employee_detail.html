@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block page_title %}{{ employee.user.full_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h5 class="mb-0">{{ employee.user.full_name }} <span class="text-muted">({{ employee.employee_code }})</span></h5>
+        <span class="text-muted small">{{ employee.location.name }}</span>
+        {% if employee.is_active %}<span class="badge bg-success ms-2">Active</span>{% else %}<span class="badge bg-secondary ms-2">Inactive</span>{% endif %}
+    </div>
+    {% if not current_user.is_employee() %}
+    <a href="{{ url_for('users.edit_employee', employee_id=employee.id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+    {% endif %}
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Profile</div>
+            <div class="card-body">
+                <ul class="list-unstyled small mb-0">
+                    <li><strong>Employee ID:</strong> {{ employee.employee_code }}</li>
+                    <li><strong>Email:</strong> {{ employee.user.email }}</li>
+                    <li><strong>Phone:</strong> {{ employee.phone or '-' }}</li>
+                    <li><strong>Designation:</strong> {{ employee.designation or '-' }}</li>
+                    <li><strong>Department:</strong> {{ employee.department or '-' }}</li>
+                    <li><strong>Location:</strong> {{ employee.location.name }}</li>
+                    <li><strong>Supervisor:</strong> {{ employee.stock_manager.full_name if employee.stock_manager else '-' }}</li>
+                    <li><strong>Joining Date:</strong> {{ employee.joined_at.strftime('%Y-%m-%d') if employee.joined_at else '-' }}</li>
+                    <li><strong>Created:</strong> {{ employee.created_at.strftime('%Y-%m-%d') if employee.created_at else '-' }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Current Employee Stock</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Product</th><th class="text-end">Quantity</th></tr></thead>
+                    <tbody>
+                    {% for s in current_stock %}
+                        <tr><td>{{ s.product.name }}</td><td class="text-end fw-semibold">{{ s.quantity }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="2" class="text-muted text-center py-3">No stock currently assigned.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if pending_returns %}
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Pending Return Requests</div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Product</th><th class="text-end">Qty</th><th>Reported Condition</th><th>Requested</th></tr></thead>
+            <tbody>
+            {% for r in pending_returns %}
+                <tr>
+                    <td>{{ r.product.name }}</td><td class="text-end">{{ r.quantity }}</td>
+                    <td><span class="badge bg-info text-dark">{{ r.reported_condition }}</span></td>
+                    <td>{{ r.requested_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Stock Transaction History</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Date</th><th>Product</th><th>Type</th><th class="text-end">Change</th></tr></thead>
+                    <tbody>
+                    {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ t.product.name }}</td>
+                            <td><span class="badge bg-secondary">{{ t.transaction_type }}</span></td>
+                            <td class="text-end {{ 'text-success' if t.quantity_change > 0 else 'text-danger' }}">{{ '+' if t.quantity_change > 0 else '' }}{{ t.quantity_change }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4" class="text-muted text-center py-3">No transactions yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Return History</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Date</th><th>Product</th><th class="text-end">Qty</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for r in return_history %}
+                        <tr>
+                            <td>{{ r.requested_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ r.product.name }}</td>
+                            <td class="text-end">{{ r.quantity }}</td>
+                            <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4" class="text-muted text-center py-3">No return history yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

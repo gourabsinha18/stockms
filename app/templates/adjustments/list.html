@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block page_title %}Stock Adjustments{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h5 class="mb-0">Stock Adjustments</h5>
+    <a href="{{ url_for('adjustments.new_adjustment') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Adjustment</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Code</th><th>Location</th><th>Product</th><th class="text-end">Prev</th><th class="text-end">Change</th><th class="text-end">New</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for a in adjustments %}
+                <tr>
+                    <td>{{ a.adjustment_code }}</td>
+                    <td>{{ a.location.name }}</td>
+                    <td>{{ a.product.name }}</td>
+                    <td class="text-end">{{ a.previous_qty }}</td>
+                    <td class="text-end {{ 'text-success' if a.adjustment_qty > 0 else 'text-danger' }}">{{ '+' if a.adjustment_qty > 0 else '' }}{{ a.adjustment_qty }}</td>
+                    <td class="text-end">{{ a.new_qty }}</td>
+                    <td><span class="badge badge-status-{{ a.status }}">{{ a.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('adjustments.view_adjustment', adjustment_id=a.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted text-center py-4">No adjustments found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

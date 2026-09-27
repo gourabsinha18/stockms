@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="mb-3 text-muted">Assigned location: <span class="badge bg-primary">{{ location.name if location else 'Not assigned' }}</span></div>
+<div class="row">
+    {% with label="My Requests", value=my_requests_count, icon="bi-inbox" %}{% include "main/_stat_card.html" %}{% endwith %}
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+        <span>Available Stock at My Location</span>
+        <a href="{{ url_for('stock.current_stock') }}" class="small">View all</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Product</th><th class="text-end">Quantity</th></tr></thead>
+            <tbody>
+            {% for s, product in stock %}
+                <tr><td>{{ product.name }}</td><td class="text-end">{{ s.quantity }}</td></tr>
+            {% else %}
+                <tr><td colspan="2" class="text-muted">No stock data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold">Recent Activity at My Location</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Date</th><th>Product</th><th>Type</th><th class="text-end">Change</th></tr></thead>
+            <tbody>
+            {% for m in recent %}
+                <tr>
+                    <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ m.product.name }}</td>
+                    <td><span class="badge bg-secondary">{{ m.movement_type }}</span></td>
+                    <td class="text-end {{ 'text-success' if m.qty_change > 0 else 'text-danger' }}">{{ '+' if m.qty_change > 0 else '' }}{{ m.qty_change }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

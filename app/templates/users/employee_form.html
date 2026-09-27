@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_title %}{{ 'Edit Employee' if mode == 'edit' else 'New Employee' }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">{{ form.employee_code.label(class="form-label") }}{{ form.employee_code(class="form-control", placeholder="Leave blank to auto-generate" if mode != 'edit' else "") }}</div>
+                    {% if mode != 'edit' %}
+                    <div class="mb-3">{{ form.username.label(class="form-label") }}{{ form.username(class="form-control") }}</div>
+                    {% endif %}
+                    <div class="mb-3">{{ form.full_name.label(class="form-label") }}{{ form.full_name(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.phone.label(class="form-label") }}{{ form.phone(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.designation.label(class="form-label") }}{{ form.designation(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.department.label(class="form-label") }}{{ form.department(class="form-control") }}</div>
+                    {% if mode != 'edit' %}
+                    <div class="mb-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}</div>
+                    {% endif %}
+                    <div class="mb-3">{{ form.location_id.label(class="form-label") }}{{ form.location_id(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.stock_manager_id.label(class="form-label") }}{{ form.stock_manager_id(class="form-select") }}</div>
+                    {% if mode == 'edit' %}
+                    <div class="mb-3 form-check">{{ form.is_active(class="form-check-input") }}{{ form.is_active.label(class="form-check-label") }}</div>
+                    {% endif %}
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

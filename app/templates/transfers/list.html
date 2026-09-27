@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block page_title %}Stock Transfers{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h5 class="mb-0">Stock Transfers</h5>
+    <a href="{{ url_for('transfers.new_transfer') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Transfer</a>
+</div>
+<form method="GET" class="mb-3">
+    <select name="status" class="form-select" style="max-width:220px;" onchange="this.form.submit()">
+        <option value="">All statuses</option>
+        {% for s in ['DRAFT','PENDING_APPROVAL','APPROVED','REJECTED','PROCESSING','COMPLETED','CANCELLED'] %}
+            <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+</form>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Status</th><th>Requested By</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+            {% for t in transfers %}
+                <tr>
+                    <td>{{ t.transfer_code }}</td>
+                    <td>{{ t.source_location.name }}</td>
+                    <td>{{ t.dest_location.name }}</td>
+                    <td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+                    <td>{{ t.requester.full_name }}</td>
+                    <td>{{ t.requested_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="text-end"><a href="{{ url_for('transfers.view_transfer', transfer_id=t.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="text-muted text-center py-4">No transfers found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

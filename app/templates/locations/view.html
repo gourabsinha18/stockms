@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block page_title %}{{ location.name }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <span class="badge bg-primary">{{ location.code }}</span>
+    <span class="text-muted">{{ location.address or '' }}</span>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Employees</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Name</th><th>Username</th></tr></thead>
+                    <tbody>
+                    {% for e in employees %}
+                        <tr><td>{{ e.user.full_name }}</td><td>{{ e.user.username }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="2" class="text-muted">No employees.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Stock at this Location</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Product</th><th class="text-end">Qty</th></tr></thead>
+                    <tbody>
+                    {% for s, p in stock %}
+                        <tr><td>{{ p.name }}</td><td class="text-end">{{ s.quantity }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="2" class="text-muted">No stock records.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

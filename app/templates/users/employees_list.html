@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block page_title %}Employee Directory{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">Employee Directory</h5>
+    <a href="{{ url_for('users.new_employee') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Employee</a>
+</div>
+
+<div class="row mb-3 g-2">
+    {% for loc_name, count in location_counts.items() %}
+    <div class="col-auto">
+        <span class="badge bg-light text-dark border">{{ loc_name }}: <strong>{{ count }}</strong></span>
+    </div>
+    {% endfor %}
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="location_id" class="form-select" onchange="this.form.submit()">
+            <option value="">All Locations</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if location_id==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="text" name="q" class="form-control" placeholder="Search ID, name, phone, email, designation" value="{{ q }}" style="min-width:280px;">
+    </div>
+    <div class="col-auto">
+        <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            <option value="active" {% if status_filter=='active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter=='inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="designation" class="form-select" onchange="this.form.submit()">
+            <option value="">All Designations</option>
+            {% for d in designations %}<option value="{{ d }}" {% if designation_filter==d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="department" class="form-select" onchange="this.form.submit()">
+            <option value="">All Departments</option>
+            {% for d in departments %}<option value="{{ d }}" {% if department_filter==d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-secondary" type="submit">Filter</button></div>
+</form>
+
+{% for loc_name, emps in grouped.items() %}
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">{{ loc_name }} <span class="text-muted">({{ emps|length }} on this page)</span></div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Employee ID</th><th>Name</th><th>Designation</th><th>Department</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for e in emps %}
+                <tr>
+                    <td>{{ e.employee_code }}</td>
+                    <td><a href="{{ url_for('users.employee_detail', employee_id=e.id) }}">{{ e.user.full_name }}</a></td>
+                    <td>{{ e.designation or '-' }}</td>
+                    <td>{{ e.department or '-' }}</td>
+                    <td>{{ e.phone or '-' }}</td>
+                    <td>{% if e.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('users.employee_detail', employee_id=e.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                        <a href="{{ url_for('users.edit_employee', employee_id=e.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="POST" action="{{ url_for('users.toggle_employee', employee_id=e.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-sm btn-outline-secondary">{{ 'Deactivate' if e.is_active else 'Activate' }}</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card"><div class="card-body text-muted text-center py-4">No employees found.</div></div>
+{% endfor %}
+
+{% include "_pagination.html" %}
+{% endblock %}

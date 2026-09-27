@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block page_title %}Bad Product History{% endblock %}
+{% block content %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i>
+    This ledger shows only bad-product movements (recoveries approved, bad transfers in/out). It is kept separate
+    from the normal Stock History.
+</div>
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="location_id" class="form-select" onchange="this.form.submit()">
+            <option value="">All Locations</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if location_filter==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="product_id" class="form-select" onchange="this.form.submit()">
+            <option value="">All Products</option>
+            {% for p in products %}<option value="{{ p.id }}" {% if product_filter==p.id %}selected{% endif %}>{{ p.sku }} - {{ p.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="movement_type" class="form-select" onchange="this.form.submit()">
+            <option value="">All Types</option>
+            {% for m in ['BAD_RECOVERY_APPROVED','BAD_TRANSFER_OUT','BAD_TRANSFER_IN'] %}
+                <option value="{{ m }}" {% if movement_type==m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('bad_products.history', location_id=location_filter, product_id=product_filter, movement_type=movement_type, export='csv') }}" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export CSV</a>
+    </div>
+</form>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-sm table-hover">
+            <thead><tr><th>Date</th><th>Product</th><th>Location</th><th>Type</th><th class="text-end">Before</th><th class="text-end">Change</th><th class="text-end">After</th><th>By</th></tr></thead>
+            <tbody>
+            {% for m in movements %}
+                <tr>
+                    <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ m.product.name }}</td>
+                    <td>{{ m.location.name }}</td>
+                    <td><span class="badge bg-secondary">{{ m.movement_type }}</span></td>
+                    <td class="text-end">{{ m.quantity_before }}</td>
+                    <td class="text-end {{ 'text-success' if m.quantity_change > 0 else 'text-danger' }}">{{ '+' if m.quantity_change > 0 else '' }}{{ m.quantity_change }}</td>
+                    <td class="text-end">{{ m.quantity_after }}</td>
+                    <td>{{ m.user.full_name }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted text-center py-4">No bad product movements found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

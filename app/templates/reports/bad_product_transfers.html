@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block page_title %}Bad Product Transfer Report{% endblock %}
+{% block content %}
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="source_id" class="form-select">
+            <option value="">Any Source</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if source_id==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="dest_id" class="form-select">
+            <option value="">Any Destination</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if dest_id==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="product_id" class="form-select">
+            <option value="">All Products</option>
+            {% for p in products %}<option value="{{ p.id }}" {% if product_id==p.id %}selected{% endif %}>{{ p.sku }} - {{ p.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="status" class="form-select">
+            <option value="">All Statuses</option>
+            {% for s in ['REQUESTED','APPROVED','DISPATCHED','COMPLETED','REJECTED','CANCELLED'] %}
+                <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto"><input type="date" name="date_from" class="form-control" value="{{ date_from }}"></div>
+    <div class="col-auto"><input type="date" name="date_to" class="form-control" value="{{ date_to }}"></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary" type="submit">Filter</button></div>
+    <div class="col-auto ms-auto">
+        <a href="{{ url_for('reports.bad_product_transfer_report', source_id=source_id, dest_id=dest_id, product_id=product_id, status=status_filter, date_from=date_from, date_to=date_to, export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+    </div>
+</form>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover table-sm">
+            <thead><tr>
+                <th>Transfer Code</th><th>Source</th><th>Destination</th><th>Product</th><th class="text-end">Qty</th>
+                <th>Requested By</th><th>Status</th><th>Requested</th><th>Approved</th><th>Dispatched</th><th>Completed</th>
+            </tr></thead>
+            <tbody>
+            {% for t in rows %}
+                <tr>
+                    <td>{{ t.transfer_code }}</td>
+                    <td>{{ t.source_location.name }}</td>
+                    <td>{{ t.dest_location.name }}</td>
+                    <td>{{ t.items|map(attribute='product.name')|join(', ') }}</td>
+                    <td class="text-end">{{ t.items|sum(attribute='quantity') }}</td>
+                    <td>{{ t.requester.full_name }}</td>
+                    <td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+                    <td>{{ t.requested_at.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ t.approved_at.strftime('%Y-%m-%d') if t.approved_at else '-' }}</td>
+                    <td>{{ t.dispatched_at.strftime('%Y-%m-%d') if t.dispatched_at else '-' }}</td>
+                    <td>{{ t.completed_at.strftime('%Y-%m-%d') if t.completed_at else '-' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="11" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

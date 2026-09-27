@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_title %}Issue Stock to Employee{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">{{ form.employee_id.label(class="form-label") }}{{ form.employee_id(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.product_id.label(class="form-label") }}{{ form.product_id(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.quantity.label(class="form-label") }}{{ form.quantity(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.reason.label(class="form-label") }}{{ form.reason(class="form-control") }}</div>
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

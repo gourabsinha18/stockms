@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block page_title %}Adjustment Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('reports.adjustment_report', export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead><tr><th>Code</th><th>Location</th><th>Product</th><th class="text-end">Previous</th><th class="text-end">Change</th><th class="text-end">New</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in rows %}
+                <tr>
+                    <td>{{ a.adjustment_code }}</td><td>{{ a.location.name }}</td><td>{{ a.product.name }}</td>
+                    <td class="text-end">{{ a.previous_qty }}</td>
+                    <td class="text-end {{ 'text-success' if a.adjustment_qty > 0 else 'text-danger' }}">{{ '+' if a.adjustment_qty > 0 else '' }}{{ a.adjustment_qty }}</td>
+                    <td class="text-end">{{ a.new_qty }}</td><td>{{ a.reason }}</td>
+                    <td><span class="badge badge-status-{{ a.status }}">{{ a.status }}</span></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

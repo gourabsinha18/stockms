@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block page_title %}Transfer Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('reports.transfer_report', export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Status</th><th>Requested By</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for t in rows %}
+                <tr>
+                    <td>{{ t.transfer_code }}</td><td>{{ t.source_location.name }}</td><td>{{ t.dest_location.name }}</td>
+                    <td><span class="badge badge-status-{{ t.status }}">{{ t.status }}</span></td>
+                    <td>{{ t.requester.full_name }}</td><td>{{ t.requested_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

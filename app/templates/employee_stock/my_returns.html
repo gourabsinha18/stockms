@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}My Return Requests{% endblock %}
+{% block content %}
+<h5 class="mb-3">My Return Requests</h5>
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Pending</div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Code</th><th>Product</th><th class="text-end">Qty</th><th>Reported</th><th>Requested</th></tr></thead>
+            <tbody>
+            {% for r in pending %}
+                <tr>
+                    <td><a href="{{ url_for('employee_stock.view_return', return_id=r.id) }}">{{ r.return_code }}</a></td>
+                    <td>{{ r.product.name }}</td><td class="text-end">{{ r.quantity }}</td>
+                    <td><span class="badge bg-info text-dark">{{ r.reported_condition }}</span></td>
+                    <td>{{ r.requested_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-muted text-center py-3">No pending requests.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header bg-white fw-semibold">History</div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Code</th><th>Product</th><th class="text-end">Qty</th><th>Status</th><th>Remarks</th></tr></thead>
+            <tbody>
+            {% for r in history %}
+                <tr>
+                    <td><a href="{{ url_for('employee_stock.view_return', return_id=r.id) }}">{{ r.return_code }}</a></td>
+                    <td>{{ r.product.name }}</td><td class="text-end">{{ r.quantity }}</td>
+                    <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                    <td>{{ r.manager_remarks or '-' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-muted text-center py-3">No history yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

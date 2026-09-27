@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block page_title %}Product-wise Stock Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('reports.stock_by_product', export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead><tr><th>SKU</th><th>Product</th><th class="text-end">Total Quantity</th></tr></thead>
+            <tbody>
+            {% for sku, name, qty in rows %}
+                <tr><td>{{ sku }}</td><td>{{ name }}</td><td class="text-end">{{ qty }}</td></tr>
+            {% else %}
+                <tr><td colspan="3" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

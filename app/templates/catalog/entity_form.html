@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    {% for field in form if field.type not in ('CSRFTokenField', 'SubmitField', 'BooleanField') %}
+                        <div class="mb-3">
+                            {{ field.label(class="form-label") }}
+                            {% if field.type == 'SelectField' %}
+                                {{ field(class="form-select") }}
+                            {% elif field.type == 'TextAreaField' %}
+                                {{ field(class="form-control", rows=3) }}
+                            {% else %}
+                                {{ field(class="form-control") }}
+                            {% endif %}
+                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% for field in form if field.type == 'BooleanField' %}
+                        <div class="form-check mb-3">
+                            {{ field(class="form-check-input") }}
+                            {{ field.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

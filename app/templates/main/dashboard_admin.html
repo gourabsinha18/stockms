@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block page_title %}Main Admin Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+    {% with label="Locations", value=total_locations, icon="bi-geo-alt" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Stock Managers", value=total_managers, icon="bi-person-badge" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Employees", value=total_employees, icon="bi-people" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Products", value=total_products, icon="bi-tags" %}{% include "main/_stat_card.html" %}{% endwith %}
+</div>
+<div class="row">
+    {% with label="Total Available Stock", value=total_stock, icon="bi-box-seam" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Pending Transfers", value=pending_transfers, icon="bi-arrow-left-right" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Pending Adjustments", value=pending_adjustments, icon="bi-sliders" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Pending Returns", value=pending_returns, icon="bi-arrow-return-left" %}{% include "main/_stat_card.html" %}{% endwith %}
+</div>
+<div class="row">
+    {% with label="Bad Product Stock", value=total_bad_stock, icon="bi-exclamation-triangle" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Pending Bad Recoveries", value=pending_bad_recoveries, icon="bi-arrow-repeat" %}{% include "main/_stat_card.html" %}{% endwith %}
+</div>
+<div class="row">
+    {% with label="Pending Employee Returns", value=pending_employee_returns, icon="bi-arrow-return-left" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Good Returns", value=good_returns_count, icon="bi-check-circle" %}{% include "main/_stat_card.html" %}{% endwith %}
+    {% with label="Bad Returns", value=bad_returns_count, icon="bi-x-circle" %}{% include "main/_stat_card.html" %}{% endwith %}
+</div>
+<div class="row mb-3 g-2">
+    {% for loc_name, count in employees_by_location %}
+    <div class="col-auto"><span class="badge bg-light text-dark border">{{ loc_name }}: <strong>{{ count }}</strong> employee(s)</span></div>
+    {% endfor %}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Location-wise Stock Summary</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Location</th><th class="text-end">Total Quantity</th></tr></thead>
+                    <tbody>
+                    {% for name, qty in location_summary %}
+                        <tr><td>{{ name }}</td><td class="text-end">{{ qty }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+                <span>Low Stock Products</span>
+                <a href="{{ url_for('reports.low_stock') }}" class="small">View report</a>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Product</th><th>Location</th><th class="text-end">Qty</th></tr></thead>
+                    <tbody>
+                    {% for stock, product, location in low_stock %}
+                        <tr><td>{{ product.name }}</td><td>{{ location.name }}</td><td class="text-end text-danger fw-semibold">{{ stock.quantity }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="3" class="text-muted">No low-stock items.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+        <span>Recent Stock Movements</span>
+        <a href="{{ url_for('stock.stock_history') }}" class="small">View all</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead><tr><th>Date</th><th>Product</th><th>Location</th><th>Type</th><th class="text-end">Change</th><th>By</th></tr></thead>
+            <tbody>
+            {% for m in recent_movements %}
+                <tr>
+                    <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ m.product.name }}</td>
+                    <td>{{ m.location.name }}</td>
+                    <td><span class="badge bg-secondary">{{ m.movement_type }}</span></td>
+                    <td class="text-end {{ 'text-success' if m.qty_change > 0 else 'text-danger' }}">{{ '+' if m.qty_change > 0 else '' }}{{ m.qty_change }}</td>
+                    <td>{{ m.user.full_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

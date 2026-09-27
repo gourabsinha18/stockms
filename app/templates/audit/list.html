@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block page_title %}Audit Logs{% endblock %}
+{% block content %}
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="action" class="form-select" onchange="this.form.submit()">
+            <option value="">All Actions</option>
+            {% for a in actions %}<option value="{{ a }}" {% if action_filter==a %}selected{% endif %}>{{ a }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="entity" class="form-select" onchange="this.form.submit()">
+            <option value="">All Entities</option>
+            {% for e in entities %}<option value="{{ e }}" {% if entity_filter==e %}selected{% endif %}>{{ e }}</option>{% endfor %}
+        </select>
+    </div>
+</form>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-sm table-hover">
+            <thead><tr><th>Date</th><th>User</th><th>Action</th><th>Entity</th><th>Entity ID</th><th>Previous</th><th>New</th><th>IP</th></tr></thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.user.full_name if log.user else 'System' }}</td>
+                    <td><span class="badge bg-secondary">{{ log.action }}</span></td>
+                    <td>{{ log.entity }}</td>
+                    <td>{{ log.entity_id or '-' }}</td>
+                    <td class="text-muted small">{{ log.previous_value or '-' }}</td>
+                    <td class="text-muted small">{{ log.new_value or '-' }}</td>
+                    <td class="text-muted small">{{ log.ip_address or '-' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted text-center py-4">No audit records found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-muted small">This log is immutable and cannot be edited or deleted through the application.</div>
+    </div>
+</div>
+{% endblock %}

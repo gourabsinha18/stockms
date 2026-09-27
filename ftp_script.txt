@@ -1,0 +1,4 @@
+open ftp.gfksolutions.com
+user admin admin@2026
+ls
+quit

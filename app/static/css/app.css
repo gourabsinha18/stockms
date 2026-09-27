@@ -1,0 +1,20 @@
+body { background-color: #f4f6f9; }
+.sidebar { width: 240px; min-height: 100vh; }
+.sidebar .nav-link { padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.92rem; }
+.sidebar .nav-link:hover { background-color: rgba(255,255,255,0.08); }
+.sidebar-heading { color: #8a94a6; text-transform: uppercase; font-size: 0.72rem; letter-spacing: .05em; padding: 0.9rem 0.75rem 0.2rem; }
+.card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 10px; }
+.stat-card .stat-value { font-size: 1.9rem; font-weight: 700; }
+.table thead th { font-size: 0.78rem; text-transform: uppercase; color: #6c757d; border-top: none; }
+.badge-status-DRAFT { background:#6c757d; }
+.badge-status-PENDING_APPROVAL { background:#fd7e14; }
+.badge-status-APPROVED { background:#0d6efd; }
+.badge-status-REJECTED { background:#dc3545; }
+.badge-status-PROCESSING { background:#6610f2; }
+.badge-status-COMPLETED { background:#198754; }
+.badge-status-CANCELLED { background:#adb5bd; }
+.badge-status-PENDING { background:#fd7e14; }
+.badge-status-REQUESTED { background:#fd7e14; }
+.badge-status-DISPATCHED { background:#6610f2; }
+.badge-status-APPROVED_GOOD { background:#198754; }
+.badge-status-APPROVED_BAD { background:#dc3545; }

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block page_title %}New Stock Adjustment{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">{{ form.location_id.label(class="form-label") }}{{ form.location_id(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.product_id.label(class="form-label") }}{{ form.product_id(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.adjustment_qty.label(class="form-label") }}{{ form.adjustment_qty(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.reason.label(class="form-label") }}{{ form.reason(class="form-select") }}</div>
+                    <div class="mb-3">{{ form.remarks.label(class="form-label") }}{{ form.remarks(class="form-control", rows=3) }}</div>
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

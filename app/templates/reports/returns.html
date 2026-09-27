@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_title %}Return Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('reports.return_report', export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td>{{ r.return_code }}</td><td>{{ r.source_location.name }}</td><td>{{ r.dest_location.name }}</td>
+                    <td>{{ r.reason }}</td><td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

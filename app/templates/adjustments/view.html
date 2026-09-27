@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block page_title %}Adjustment {{ adj.adjustment_code }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="badge badge-status-{{ adj.status }} fs-6">{{ adj.status }}</span>
+    {% if adj.status == 'PENDING_APPROVAL' and (current_user.is_main_admin() or current_user.is_stock_manager()) %}
+    <div>
+        <form method="POST" action="{{ url_for('adjustments.approve', adjustment_id=adj.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-success btn-sm">Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('adjustments.reject', adjustment_id=adj.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger btn-sm">Reject</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Location</dt><dd class="col-sm-9">{{ adj.location.name }}</dd>
+            <dt class="col-sm-3">Product</dt><dd class="col-sm-9">{{ adj.product.name }} ({{ adj.product.sku }})</dd>
+            <dt class="col-sm-3">Previous Qty</dt><dd class="col-sm-9">{{ adj.previous_qty }}</dd>
+            <dt class="col-sm-3">Adjustment</dt><dd class="col-sm-9">{{ '+' if adj.adjustment_qty > 0 else '' }}{{ adj.adjustment_qty }}</dd>
+            <dt class="col-sm-3">New Qty</dt><dd class="col-sm-9">{{ adj.new_qty }}</dd>
+            <dt class="col-sm-3">Reason</dt><dd class="col-sm-9">{{ adj.reason }}</dd>
+            <dt class="col-sm-3">Requested By</dt><dd class="col-sm-9">{{ adj.requester.full_name }} on {{ adj.requested_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+            {% if adj.approver %}<dt class="col-sm-3">Actioned By</dt><dd class="col-sm-9">{{ adj.approver.full_name }} on {{ adj.approved_at.strftime('%Y-%m-%d %H:%M') }}</dd>{% endif %}
+            {% if adj.remarks %}<dt class="col-sm-3">Remarks</dt><dd class="col-sm-9">{{ adj.remarks }}</dd>{% endif %}
+        </dl>
+    </div>
+</div>
+{% endblock %}

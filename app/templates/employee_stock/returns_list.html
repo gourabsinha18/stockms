@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block page_title %}Employee Return Requests{% endblock %}
+{% block content %}
+<h5 class="mb-3">Employee Return Requests</h5>
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            {% for s in ['PENDING','APPROVED_GOOD','APPROVED_BAD','REJECTED'] %}
+                <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="location_id" class="form-select" onchange="this.form.submit()">
+            <option value="">All Locations</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if location_id==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+</form>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Code</th><th>Employee</th><th>Location</th><th>Product</th><th class="text-end">Qty</th><th>Reported</th><th>Status</th><th>Requested</th><th></th></tr></thead>
+            <tbody>
+            {% for r in returns %}
+                <tr>
+                    <td>{{ r.return_code }}</td>
+                    <td>{{ r.employee.user.full_name }}</td>
+                    <td>{{ r.location.name }}</td>
+                    <td>{{ r.product.name }}</td>
+                    <td class="text-end">{{ r.quantity }}</td>
+                    <td><span class="badge bg-info text-dark">{{ r.reported_condition }}</span></td>
+                    <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                    <td>{{ r.requested_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="text-end"><a href="{{ url_for('employee_stock.view_return', return_id=r.id) }}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="9" class="text-muted text-center py-4">No return requests found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

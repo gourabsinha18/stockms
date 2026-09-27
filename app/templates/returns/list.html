@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block page_title %}Stock Returns{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h5 class="mb-0">Stock Returns</h5>
+    <a href="{{ url_for('returns.new_return') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Return</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Code</th><th>Source</th><th>Destination</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for r in returns %}
+                <tr>
+                    <td>{{ r.return_code }}</td>
+                    <td>{{ r.source_location.name }}</td>
+                    <td>{{ r.dest_location.name }}</td>
+                    <td class="text-muted small">{{ r.reason }}</td>
+                    <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                    <td class="text-end"><a href="{{ url_for('returns.view_return', return_id=r.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-muted text-center py-4">No returns found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

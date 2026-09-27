@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block page_title %}Employee Stock Report{% endblock %}
+{% block content %}
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="location_id" class="form-select">
+            <option value="">All Locations</option>
+            {% for l in locations %}<option value="{{ l.id }}" {% if location_id==l.id %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="employee_id" class="form-select">
+            <option value="">All Employees</option>
+            {% for e in employees %}<option value="{{ e.id }}" {% if employee_id==e.id %}selected{% endif %}>{{ e.employee_code }} - {{ e.user.full_name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="product_id" class="form-select">
+            <option value="">All Products</option>
+            {% for p in products %}<option value="{{ p.id }}" {% if product_id==p.id %}selected{% endif %}>{{ p.sku }} - {{ p.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="type" class="form-select">
+            <option value="">All Types</option>
+            {% for t in ['ISSUE','GOOD_RETURN','BAD_RETURN'] %}<option value="{{ t }}" {% if txn_type==t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto"><input type="date" name="date_from" class="form-control" value="{{ date_from }}"></div>
+    <div class="col-auto"><input type="date" name="date_to" class="form-control" value="{{ date_to }}"></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary" type="submit">Filter</button></div>
+    <div class="col-auto ms-auto">
+        <a href="{{ url_for('reports.employee_stock_report', location_id=location_id, employee_id=employee_id, product_id=product_id, type=txn_type, date_from=date_from, date_to=date_to, export='csv') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+    </div>
+</form>
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Employee Stock Movements</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead><tr><th>Date</th><th>Employee</th><th>Location</th><th>Product</th><th>Type</th><th class="text-end">Change</th><th>By</th></tr></thead>
+            <tbody>
+            {% for t in transactions %}
+                <tr>
+                    <td>{{ t.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ t.employee.employee_code }} - {{ t.employee.user.full_name }}</td>
+                    <td>{{ t.employee.location.name }}</td>
+                    <td>{{ t.product.name }}</td>
+                    <td><span class="badge bg-secondary">{{ t.transaction_type }}</span></td>
+                    <td class="text-end {{ 'text-success' if t.quantity_change > 0 else 'text-danger' }}">{{ '+' if t.quantity_change > 0 else '' }}{{ t.quantity_change }}</td>
+                    <td>{{ t.performer.full_name }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold">Return Requests</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead><tr><th>Code</th><th>Employee</th><th>Product</th><th class="text-end">Qty</th><th>Reported</th><th>Status</th><th>Requested</th></tr></thead>
+            <tbody>
+            {% for r in returns %}
+                <tr>
+                    <td>{{ r.return_code }}</td>
+                    <td>{{ r.employee.employee_code }} - {{ r.employee.user.full_name }}</td>
+                    <td>{{ r.product.name }}</td>
+                    <td class="text-end">{{ r.quantity }}</td>
+                    <td><span class="badge bg-info text-dark">{{ r.reported_condition }}</span></td>
+                    <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                    <td>{{ r.requested_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="text-muted text-center py-4">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

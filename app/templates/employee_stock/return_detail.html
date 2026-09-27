@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block page_title %}Return {{ ret.return_code }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <span class="badge badge-status-{{ ret.status }} fs-6">{{ ret.status }}</span>
+        <span class="text-muted ms-2">{{ ret.location.name }}</span>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Details</div>
+    <div class="card-body">
+        <ul class="list-unstyled small mb-0">
+            <li><strong>Employee:</strong> {{ ret.employee.user.full_name }} ({{ ret.employee.employee_code }})</li>
+            <li><strong>Product:</strong> {{ ret.product.name }}</li>
+            <li><strong>Quantity:</strong> {{ ret.quantity }}</li>
+            <li><strong>Employee Reported Condition:</strong> <span class="badge bg-info text-dark">{{ ret.reported_condition }}</span> <span class="text-muted">(this is only a report - the Stock Manager makes the final classification)</span></li>
+            {% if ret.reason %}<li><strong>Reason:</strong> {{ ret.reason }}</li>{% endif %}
+            <li><strong>Requested At:</strong> {{ ret.requested_at.strftime('%Y-%m-%d %H:%M') }}</li>
+            {% if ret.reviewer %}<li><strong>Reviewed By:</strong> {{ ret.reviewer.full_name }} on {{ ret.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</li>{% endif %}
+            {% if ret.manager_remarks %}<li><strong>Manager Remarks:</strong> {{ ret.manager_remarks }}</li>{% endif %}
+        </ul>
+    </div>
+</div>
+
+{% if ret.status == 'PENDING' and (current_user.is_main_admin() or current_user.is_stock_manager()) %}
+<div class="card">
+    <div class="card-header bg-white fw-semibold">Manager Decision</div>
+    <div class="card-body">
+        <form method="POST" class="mb-3">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">{{ form.remarks.label(class="form-label") }}{{ form.remarks(class="form-control", rows=2) }}</div>
+        </form>
+        <div class="d-flex gap-2">
+            <form method="POST" action="{{ url_for('employee_stock.approve_good', return_id=ret.id) }}" onsubmit="return copyRemarks(this)">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="remarks" class="remarks-mirror">
+                <button class="btn btn-success">Approve as GOOD Stock</button>
+            </form>
+            <form method="POST" action="{{ url_for('employee_stock.approve_bad', return_id=ret.id) }}" onsubmit="return copyRemarks(this)">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="remarks" class="remarks-mirror">
+                <button class="btn btn-danger">Approve as BAD Stock</button>
+            </form>
+            <form method="POST" action="{{ url_for('employee_stock.reject', return_id=ret.id) }}" onsubmit="return copyRemarks(this)">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="remarks" class="remarks-mirror">
+                <button class="btn btn-outline-secondary">Reject</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function copyRemarks(form) {
+    var src = document.querySelector('textarea[name="remarks"]');
+    form.querySelector('.remarks-mirror').value = src ? src.value : '';
+    return true;
+}
+</script>
+{% endif %}
+{% endblock %}
